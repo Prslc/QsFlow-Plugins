@@ -1,0 +1,16 @@
+{
+  "include": ["."],
+  "reportUnknownMemberType": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownParameterType": false,
+  "reportUnknownArgumentType": false,
+  "reportMissingParameterType": false,
+  "reportUnusedParameter": false,
+  "reportExplicitAny": false,
+  "reportAny": false,
+  "reportUnusedCallResult": false,
+  "reportUnusedFunction": false,
+  "reportImplicitOverride": false,
+  "reportImplicitStringConcatenation": false,
+  "reportUninitializedInstanceVariable": false
+}

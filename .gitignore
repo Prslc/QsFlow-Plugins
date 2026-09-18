@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.ruff_cache/
+.pytest_cache/
+
+# Independent reference plugin, a git repo of its own.
+Flow.translate-youdao/

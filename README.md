@@ -1,0 +1,245 @@
+# QsFlow-Plugin
+
+External plugin workspace for [QsFlow](https://github.com/Prslc/QsFlow), built
+on a shared decorator framework, `qsflow_plugin`.
+
+A plugin is one directory: copy `template/`, edit `main.py`, and let the
+framework own the stdin/stdout JSON-RPC 2.0 transport.
+
+## Layout
+
+```
+qsflow-plugin/
+├── qsflow_plugin/          # shared framework
+│   ├── __init__.py         #   public API + __version__
+│   ├── _item.py            #   Item, copy_text, hint, split_command
+│   ├── _plugin.py          #   Plugin (the decorators)
+│   └── _server.py          #   Server / serve (the JSON-RPC loop)
+├── template/               # cp -r template <new-plugin>
+├── tests/test_host.py      # framework protocol contract tests (unittest)
+├── ruff.toml               # lint + format config
+├── pyrightconfig.json      # LSP config
+├── github/                 # example: GitHub repository search
+├── todo/                   # full example: todo manager
+├── base64/ bilibili_search/ cc/
+└── Flow.translate-youdao/  # reference plugin; an independent git repo
+```
+
+Plugins are independent of each other and only share the `qsflow_plugin`
+package at the workspace root. Each `main.py` bootstraps it with three lines:
+
+```python
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+```
+
+so a plugin directory must be a direct child of the workspace root.
+
+## Quick start
+
+```sh
+cp -r template my-plugin
+# edit my-plugin/main.py
+chmod +x my-plugin/main.py
+```
+
+Register it in `~/.config/qsflow/plugins.toml` (`command` is a single
+executable token, so use an absolute path):
+
+```toml
+[[plugins]]
+id = "my-plugin"          # must match the @plugin.search id
+keyword = "mp"
+command = "/absolute/path/my-plugin/main.py"
+```
+
+Minimal plugin:
+
+```python
+#!/usr/bin/env python3
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from qsflow_plugin import plugin, Item, copy_text
+
+
+@plugin.search(
+    id="my-plugin",  # must match the plugins.toml id
+    name="My Plugin",
+    keyword="mp",
+    icon="papirus:star",  # absolute path or a papirus: spec
+    description="Short description",
+)
+def search(text: str) -> list[Item]:
+    return [Item(title=f"You searched: {text}", on_click=copy_text(text))]
+
+
+plugin.run()
+```
+
+## API
+
+### `@plugin.search(**meta)`
+
+Registers the plugin identity (the `list_plugins` response) and the search
+handler on `def search(text: str)`.
+
+| Argument | Required | Meaning |
+|----------|----------|---------|
+| `id` | yes | plugin id; must match the `plugins.toml` entry |
+| `name` | no | display name (falls back to the configured id) |
+| `keyword` | no | trigger prefix (empty = a default provider) |
+| `icon` | no | absolute path or a `papirus:` spec |
+| `description` | no | readiness hint text |
+
+### `@plugin.method(name)`
+
+Registers an extra JSON-RPC method. A handler that declares a parameter
+receives the request `params`; a zero-argument handler is called with none.
+An exception returns `-32603`. Returning `Item` (or a list containing one)
+produces result rows with the same normalization as `search` (all keys
+present, icon fallback); any other value is serialized as `result` as-is.
+
+### `@plugin.default_view`
+
+Registers the plugin's **default view**: the core calls it as the `top`
+request when the plugin is opened with its keyword and an empty query, and
+shows the rows it returns (protocol: QsFlow `docs/en/jsonrpc.md`). A
+zero-argument handler; normalization matches `search`:
+
+```python
+@plugin.default_view
+def top() -> list[Item]:
+    return [
+        Item(
+            title="Buy milk",
+            summary="Open - Enter marks done",
+            on_click="run:... toggle 1",
+        )
+    ]
+```
+
+A plugin with no default view still shows its identity card (`name` +
+`description`) when opened.
+
+### `Item`
+
+One result row. The four protocol keys (`title`, `summary`, `on_click`,
+`icon`) are always emitted (unset ones as `null`); `ephemeral` is added only
+when set. An unset `icon` falls back to the plugin icon, so most rows need no
+per-row icon.
+
+```python
+Item(
+    title="Title",
+    summary="Secondary line",
+    on_click="run:xdg-open ...",
+    icon="papirus:folder-open",
+)
+```
+
+`ephemeral=True` asks the core not to record the row in usage history. Use it
+for one-shot hits whose target is not worth re-opening later (the GitHub
+plugin marks its repository results this way).
+
+`on_click` schemes: `run:<shell>`, `copy:{"text":...}`,
+`launch:<desktop-id>`, or a bare URL / `file:` / `mailto:` URI. Without one,
+the row is display-only.
+
+### `copy_text(text)`
+
+Builds an `on_click` that writes `text` to the Wayland clipboard (the JSON is
+escaped for you, so quotes and newlines are safe): `copy:{"text": "..."}`.
+
+### `hint(title, detail=None)`
+
+A non-interactive guidance row (no `on_click`, so Enter does nothing; `icon`
+falls back to the plugin icon). `title` is the main line, `detail` the
+secondary one. Useful for argument errors, progressive hints, and
+`@plugin.default_view` usage rows.
+
+```python
+return [hint("Invalid amount: 'abc'", "e.g. cc 100 usd cny")]
+```
+
+### `split_command(text) -> (verb, payload)`
+
+Splits a subcommand query: `"e hello world"` -> `("e", "hello world")`; a
+bare verb gives an empty payload. The verb is lowercased (routing is
+case-insensitive); the payload keeps its internal whitespace. Multi-word
+positional routing (like the cc plugin) just uses `text.split()`.
+
+### `plugin.run()`
+
+The last line of `main.py`. Blocks reading stdin until EOF, answering `ping`,
+`list_plugins`, `search`, `top`, and every registered method. A request
+without an `id` is a notification and produces no response.
+
+### `Plugin`, `Server`, `serve` (advanced)
+
+`plugin` is a module-level `Plugin()` for the usual one-process-one-plugin
+case. For tests or embedding, build your own `Plugin`, register handlers on
+it, and feed request lines to `Server(plugin).handle(line)`;
+`serve(plugin)` runs the stdin loop that `plugin.run()` delegates to.
+
+### Return values
+
+A `search` handler may return:
+
+- `list[Item]` / `list[dict]` — the usual case; a `dict` is normalized to an
+  `Item` (missing fields become `null`, `icon` falls back to the plugin icon)
+- a single `Item` / `dict` — wrapped into a one-element list
+
+### Exceptions
+
+- `search` raising yields a single error row (`title: "Search failed"`,
+  `summary` the exception text), so the failure is visible in the launcher
+  and the process does not crash. Catch it yourself for friendlier text.
+- A custom method (`@plugin.method`) raising returns `-32603 Internal error`.
+
+## Protocol
+
+The JSON-RPC 2.0 contract with the QsFlow core (full protocol in QsFlow
+`docs/en/jsonrpc.md`):
+
+| Case | Response |
+|------|----------|
+| `ping` | `"pong"` |
+| `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
+| `search` | array of rows; `text` must be a non-empty string, else `-32602`; `params.plugin`, when present, must equal the plugin id |
+| `top` | the default view request; rows, or `-32601` when unregistered |
+| `forget` | core relays a row that was forgotten (`on_click`); `null`, or `-32601` when unregistered |
+| request without `id` | no response (notification) |
+| unparseable / non-object / `jsonrpc != "2.0"` / non-string method | `-32600` |
+| unknown method | `-32601` |
+
+## Development
+
+```sh
+python3 -m unittest discover -s tests   # protocol contract tests
+uvx ruff check .                        # lint
+uvx ruff format .                       # format
+```
+
+Smoke-test a plugin by feeding it a request line:
+
+```sh
+printf '%s\n' '{"jsonrpc":"2.0","method":"search","params":{"text":"hello"},"id":1}' \
+  | python3 my-plugin/main.py
+```
+
+## Deployment notes
+
+- **Standalone deployment**: `qsflow_plugin` sits at the workspace root. When
+  a plugin is copied out of the workspace, make the package importable — put a
+  `qsflow_plugin/` beside it, or install the workspace with `pip`.
+- Changing a `@plugin.search` `id` means changing `plugins.toml` too, or the
+  core ignores the identity (the plugin still works, but the `?` list and the
+  keyword hint fall back to a placeholder).
+- Standard library only: `Item` and the protocol layer have no third-party
+  dependencies. Each plugin manages its own (for example
+  `Flow.translate-youdao/requirements.txt`).
