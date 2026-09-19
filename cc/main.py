@@ -9,11 +9,11 @@ Usage: cc <amount> <from> <to>    e.g. cc 1 yun usd / cc 100 usd jpy
 - currencies accept ISO 4217 codes and common aliases (yuan/rmb -> CNY,
   dollar -> USD, ...)
 - rates come from open.er-api.com (daily, 160+ currencies) and are cached in
-  ~/.config/qsflow/cc_rates.json (12h TTL), falling back to the stale cache
+  ~/.config/wayrun/cc_rates.json (12h TTL), falling back to the stale cache
   when offline
 - Enter copies the converted amount
 
-The data directory matches the todo and translate plugins (~/.config/qsflow).
+The data directory matches the todo and translate plugins (~/.config/wayrun).
 """
 
 import json
@@ -23,15 +23,15 @@ import time
 import urllib.request
 from pathlib import Path
 
-# Workspace root, home of the shared qsflow_plugin package.
+# Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qsflow_plugin import Item, copy_text, hint, plugin
+from wayrun_plugin import Item, copy_text, hint, plugin
 
 # Bundled icon (absolute path; the UI renders file://). Shared by the plugin
 # icon and the per-row fallback.
 ICON = str(Path(__file__).with_name("icon.svg"))
-DATA_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "qsflow"
+DATA_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "wayrun"
 CACHE_PATH = DATA_DIR / "cc_rates.json"
 TTL_SECONDS = 12 * 3600
 RATES_URL = "https://open.er-api.com/v6/latest/USD"
@@ -92,7 +92,7 @@ def normalize(code: str) -> str | None:
 def fetch_rates() -> dict[str, float] | None:
     """The USD-based rate table, or None when the request fails."""
     try:
-        req = urllib.request.Request(RATES_URL, headers={"User-Agent": "qsflow-cc/1.0"})
+        req = urllib.request.Request(RATES_URL, headers={"User-Agent": "wayrun-cc/1.0"})
         with urllib.request.urlopen(req, timeout=8) as resp:
             data = json.load(resp)
     except (OSError, ValueError):

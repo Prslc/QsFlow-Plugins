@@ -5,7 +5,7 @@ Demonstrates @plugin.search, @plugin.default_view, a forget handler, and
 state changes that re-invoke this script through the run: scheme (so state
 lives in a file and nothing depends on the core staying alive).
 
-Data: ~/.config/qsflow/todo.json
+Data: ~/.config/wayrun/todo.json
 Usage: type "todo", then space for all todos; keep typing to filter or add;
 Enter toggles done; Backspace deletes the selected todo.
 """
@@ -20,10 +20,10 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qsflow_plugin import Item, plugin
+from wayrun_plugin import Item, plugin
 
 ICON = "papirus:task-complete"
-DATA_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "qsflow"
+DATA_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "wayrun"
 DATA_PATH = DATA_DIR / "todo.json"
 
 # The run: scheme goes through a shell, so quote the path.

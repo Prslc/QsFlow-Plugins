@@ -1,7 +1,7 @@
-# QsFlow-Plugin
+# WayRun-Plugin
 
-[QsFlow](https://github.com/Prslc/QsFlow) 的外部插件工作区，内含一套基于装饰器的
-共享插件框架 `qsflow_plugin`。写一个新插件 = **复制 `template/`、改一个
+[WayRun](https://github.com/Prslc/WayRun) 的外部插件工作区，内含一套基于装饰器的
+共享插件框架 `wayrun_plugin`。写一个新插件 = **复制 `template/`、改一个
 `main.py`**，协议层（stdin/stdout JSON-RPC 2.0）由框架代管。
 
 English: [README.md](../../README.md)
@@ -9,8 +9,8 @@ English: [README.md](../../README.md)
 ## 目录结构
 
 ```
-qsflow-plugin/
-├── qsflow_plugin/          # 共享框架
+wayrun-plugin/
+├── wayrun_plugin/          # 共享框架
 │   ├── __init__.py         #   公共 API 与 __version__
 │   ├── _item.py            #   Item、copy_text、hint、split_command
 │   ├── _plugin.py          #   Plugin（装饰器）
@@ -25,7 +25,7 @@ qsflow-plugin/
 └── Flow.translate-youdao/  # 参考插件（独立 git 仓库）
 ```
 
-插件目录之间互不依赖，只共享根目录的 `qsflow_plugin` 包。每个插件的
+插件目录之间互不依赖，只共享根目录的 `wayrun_plugin` 包。每个插件的
 `main.py` 通过 3 行 bootstrap 把工作区根加入 `sys.path`：
 
 ```python
@@ -45,7 +45,7 @@ cp -r template my-plugin
 chmod +x my-plugin/main.py
 ```
 
-在 `~/.config/qsflow/plugins.toml` 注册（`command` 是单个可执行令牌，用绝对路径）：
+在 `~/.config/wayrun/plugins.toml` 注册（`command` 是单个可执行令牌，用绝对路径）：
 
 ```toml
 [[plugins]]
@@ -63,7 +63,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qsflow_plugin import plugin, Item, copy_text
+from wayrun_plugin import plugin, Item, copy_text
 
 
 @plugin.search(
@@ -106,7 +106,7 @@ dict）原样作为 `result` 序列化。
 
 注册插件的**默认视图**——core 以关键词 + 空格打开插件（空查询）时，会向主机
 发起 `top` 请求并展示返回的结果行（协议见
-[QsFlow jsonrpc.md](https://github.com/Prslc/QsFlow/blob/main/docs/zh_cn/jsonrpc.md)）。
+[WayRun jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md)）。
 零参数处理函数，返回结果行，归一化与 `search` 相同：
 
 ```python
@@ -193,8 +193,8 @@ return [hint("金额无效：'abc'", "例：cc 100 usd cny")]
 
 ## 框架代管的协议行为
 
-与 QsFlow 核心约定的 JSON-RPC 2.0（完整协议见
-[QsFlow jsonrpc.md](https://github.com/Prslc/QsFlow/blob/main/docs/zh_cn/jsonrpc.md)）：
+与 WayRun 核心约定的 JSON-RPC 2.0（完整协议见
+[WayRun jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md)）：
 
 | 情形 | 响应 |
 |------|------|
@@ -224,8 +224,8 @@ printf '%s\n' '{"jsonrpc":"2.0","method":"search","params":{"text":"hello"},"id"
 
 ## 部署注意
 
-- **独立部署**：`qsflow_plugin` 包在工作区根。把插件复制出工作区时需让该包
-  可导入：与插件同级放置一份 `qsflow_plugin/`，或 `pip install` 工作区。
+- **独立部署**：`wayrun_plugin` 包在工作区根。把插件复制出工作区时需让该包
+  可导入：与插件同级放置一份 `wayrun_plugin/`，或 `pip install` 工作区。
 - 修改 `@plugin.search` 的 `id` 时必须同步改 `plugins.toml`，否则核心忽略身份
   （插件仍可用，但 `?` 列表与 keyword 提示退化为默认占位）。
 - 依赖仅标准库：`Item`/协议层零第三方依赖；各插件自行管理业务依赖

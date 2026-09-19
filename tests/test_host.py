@@ -1,10 +1,10 @@
-"""Contract tests for the qsflow_plugin JSON-RPC host."""
+"""Contract tests for the wayrun_plugin JSON-RPC host."""
 
 import json
 import unittest
 from typing import Any
 
-from qsflow_plugin import Item, Plugin, Server, copy_text, hint, split_command
+from wayrun_plugin import Item, Plugin, Server, copy_text, hint, split_command
 
 
 def make_plugin() -> Plugin:

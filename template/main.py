@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""QsFlow plugin skeleton.
+"""WayRun plugin skeleton.
 
 Create a new plugin by copying this directory and editing this file:
 
     cp -r template my-plugin
 
-Then register it in ~/.config/qsflow/plugins.toml (command must be a
+Then register it in ~/.config/wayrun/plugins.toml (command must be a
 single executable token; chmod +x main.py and use an absolute path):
 
     [[plugins]]
@@ -17,12 +17,12 @@ single executable token; chmod +x main.py and use an absolute path):
 import sys
 from pathlib import Path
 
-# Workspace root, home of the shared qsflow_plugin package. When a plugin
-# is deployed outside this workspace, install qsflow_plugin (pip install
+# Workspace root, home of the shared wayrun_plugin package. When a plugin
+# is deployed outside this workspace, install wayrun_plugin (pip install
 # the workspace) instead; the line above stays harmless.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qsflow_plugin import Item, copy_text, hint, plugin
+from wayrun_plugin import Item, copy_text, hint, plugin
 
 
 @plugin.search(

@@ -5,10 +5,10 @@ from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-# Workspace root, home of the shared qsflow_plugin package.
+# Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qsflow_plugin import Item, hint, plugin
+from wayrun_plugin import Item, hint, plugin
 
 ICON = str(Path(__file__).with_name("icon.png"))
 

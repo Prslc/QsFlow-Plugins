@@ -8,5 +8,5 @@ extend-exclude = ["Flow.translate-youdao"]
 select = ["E", "F", "I", "UP", "B", "SIM", "W"]
 
 [lint.per-file-ignores]
-# The sys.path bootstrap must run before the qsflow_plugin import.
+# The sys.path bootstrap must run before the wayrun_plugin import.
 "**/main.py" = ["E402"]

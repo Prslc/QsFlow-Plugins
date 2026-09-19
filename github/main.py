@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""GitHub repository search plugin for QsFlow."""
+"""GitHub repository search plugin for WayRun."""
 
 import json
 import os
@@ -9,10 +9,10 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-# Workspace root, home of the shared qsflow_plugin package.
+# Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qsflow_plugin import Item, plugin
+from wayrun_plugin import Item, plugin
 
 ICON = "papirus:github"
 # Optional classic or fine-grained PAT; both authenticate as "Bearer". Without

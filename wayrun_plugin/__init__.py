@@ -1,9 +1,9 @@
-"""Public API for building a QsFlow external plugin host.
+"""Public API for building a WayRun external plugin host.
 
 A plugin is one ``main.py`` that registers its handlers and then calls
 ``plugin.run()``:
 
-    from qsflow_plugin import plugin, Item, copy_text
+    from wayrun_plugin import plugin, Item, copy_text
 
     @plugin.search(id="example", name="Example", keyword="ex",
                    icon="papirus:star", description="Demo plugin")
@@ -13,7 +13,7 @@ A plugin is one ``main.py`` that registers its handlers and then calls
     plugin.run()
 
 ``plugin.run()`` serves the stdin/stdout JSON-RPC 2.0 loop. The wire protocol
-is documented in the QsFlow repository (``docs/en/jsonrpc.md``).
+is documented in the WayRun repository (``docs/en/jsonrpc.md``).
 """
 
 from ._item import Item, copy_text, hint, split_command

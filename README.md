@@ -1,7 +1,7 @@
-# QsFlow-Plugin
+# WayRun-Plugin
 
-External plugin workspace for [QsFlow](https://github.com/Prslc/QsFlow), built
-on a shared decorator framework, `qsflow_plugin`.
+External plugin workspace for [WayRun](https://github.com/Prslc/WayRun), built
+on a shared decorator framework, `wayrun_plugin`.
 
 A plugin is one directory: copy `template/`, edit `main.py`, and let the
 framework own the stdin/stdout JSON-RPC 2.0 transport.
@@ -9,8 +9,8 @@ framework own the stdin/stdout JSON-RPC 2.0 transport.
 ## Layout
 
 ```
-qsflow-plugin/
-├── qsflow_plugin/          # shared framework
+wayrun-plugin/
+├── wayrun_plugin/          # shared framework
 │   ├── __init__.py         #   public API + __version__
 │   ├── _item.py            #   Item, copy_text, hint, split_command
 │   ├── _plugin.py          #   Plugin (the decorators)
@@ -25,7 +25,7 @@ qsflow-plugin/
 └── Flow.translate-youdao/  # reference plugin; an independent git repo
 ```
 
-Plugins are independent of each other and only share the `qsflow_plugin`
+Plugins are independent of each other and only share the `wayrun_plugin`
 package at the workspace root. Each `main.py` bootstraps it with three lines:
 
 ```python
@@ -45,7 +45,7 @@ cp -r template my-plugin
 chmod +x my-plugin/main.py
 ```
 
-Register it in `~/.config/qsflow/plugins.toml` (`command` is a single
+Register it in `~/.config/wayrun/plugins.toml` (`command` is a single
 executable token, so use an absolute path):
 
 ```toml
@@ -64,7 +64,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qsflow_plugin import plugin, Item, copy_text
+from wayrun_plugin import plugin, Item, copy_text
 
 
 @plugin.search(
@@ -108,7 +108,7 @@ present, icon fallback); any other value is serialized as `result` as-is.
 
 Registers the plugin's **default view**: the core calls it as the `top`
 request when the plugin is opened with its keyword and an empty query, and
-shows the rows it returns (protocol: QsFlow `docs/en/jsonrpc.md`). A
+shows the rows it returns (protocol: WayRun `docs/en/jsonrpc.md`). A
 zero-argument handler; normalization matches `search`:
 
 ```python
@@ -203,7 +203,7 @@ A `search` handler may return:
 
 ## Protocol
 
-The JSON-RPC 2.0 contract with the QsFlow core (full protocol in QsFlow
+The JSON-RPC 2.0 contract with the WayRun core (full protocol in WayRun
 `docs/en/jsonrpc.md`):
 
 | Case | Response |
@@ -234,9 +234,9 @@ printf '%s\n' '{"jsonrpc":"2.0","method":"search","params":{"text":"hello"},"id"
 
 ## Deployment notes
 
-- **Standalone deployment**: `qsflow_plugin` sits at the workspace root. When
+- **Standalone deployment**: `wayrun_plugin` sits at the workspace root. When
   a plugin is copied out of the workspace, make the package importable — put a
-  `qsflow_plugin/` beside it, or install the workspace with `pip`.
+  `wayrun_plugin/` beside it, or install the workspace with `pip`.
 - Changing a `@plugin.search` `id` means changing `plugins.toml` too, or the
   core ignores the identity (the plugin still works, but the `?` list and the
   keyword hint fall back to a placeholder).

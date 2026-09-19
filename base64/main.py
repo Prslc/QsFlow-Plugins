@@ -11,10 +11,10 @@ import base64
 import sys
 from pathlib import Path
 
-# Workspace root, home of the shared qsflow_plugin package.
+# Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qsflow_plugin import Item, copy_text, hint, plugin, split_command
+from wayrun_plugin import Item, copy_text, hint, plugin, split_command
 
 # Bundled icon (absolute path; the UI renders file://).
 ICON = str(Path(__file__).with_name("icon.png"))
