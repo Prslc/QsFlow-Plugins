@@ -21,8 +21,7 @@ wayrun-plugin/
 ├── pyrightconfig.json      # LSP 配置
 ├── github/                 # 示例：GitHub 仓库搜索
 ├── todo/                   # 完整示范：待办管理
-├── base64/ bilibili_search/ cc/
-└── Flow.translate-youdao/  # 参考插件（独立 git 仓库）
+├── base64/ bilibili_search/ cc/ translate_youdao/
 ```
 
 插件目录之间互不依赖，只共享根目录的 `wayrun_plugin` 包。每个插件的

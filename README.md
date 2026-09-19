@@ -21,8 +21,7 @@ wayrun-plugin/
 ├── pyrightconfig.json      # LSP config
 ├── github/                 # example: GitHub repository search
 ├── todo/                   # full example: todo manager
-├── base64/ bilibili_search/ cc/
-└── Flow.translate-youdao/  # reference plugin; an independent git repo
+├── base64/ bilibili_search/ cc/ translate_youdao/
 ```
 
 Plugins are independent of each other and only share the `wayrun_plugin`
