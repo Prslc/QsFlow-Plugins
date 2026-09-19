@@ -36,5 +36,5 @@ LANG_MAP = {
     "Vietnamese": Lang.VI,
     "Thai": Lang.TH,
     "Indonesian": Lang.ID,
-    "Arabic": Lang.AR
+    "Arabic": Lang.AR,
 }

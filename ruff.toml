@@ -1,9 +1,6 @@
 line-length = 88
 target-version = "py310"
 
-# An independent git repo of its own; not part of this workspace's lint.
-extend-exclude = ["Flow.translate-youdao"]
-
 [lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "W"]
 

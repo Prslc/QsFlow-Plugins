@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
 """Translate settings from ~/.config/wayrun/translate.toml.
 
 A template is written on first run; credentials missing or unreadable config
 mean "not configured" (`load_settings` returns None).
 """
-import os
-import tomllib
 
+import contextlib
+import os
 from pathlib import Path
+
+import tomllib
 
 from .lang import LANG_MAP
 
@@ -31,10 +32,8 @@ app_secret = ""
 def load_settings():
     if not CONFIG_PATH.exists():
         CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-        try:
+        with contextlib.suppress(OSError):
             CONFIG_PATH.write_text(CONFIG_TEMPLATE, encoding="utf-8")
-        except OSError:
-            pass
         return None
     try:
         with CONFIG_PATH.open("rb") as f:
